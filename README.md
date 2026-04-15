@@ -1,5 +1,11 @@
 # 🎵 Music Recommender Simulation
 
+## Project Summary
+
+This project is a rule-based music recommender built for classroom exploration. It reads a small song catalog and ranks songs using user preferences for genre, mood, and energy. The system is designed to be easy to understand, test, and explain, with score reasons shown for every recommendation.
+
+I evaluated the recommender with multiple user profiles, including edge cases, and documented observed behavior, bias risks, and improvement ideas in the model card.
+
 ## Evaluation Screenshots
 
 These screenshots show the terminal output from the profile stress test. They reflect the temporary experiment where energy was weighted more strongly than genre.
@@ -19,10 +25,6 @@ These screenshots show the terminal output from the profile stress test. They re
 ### Conflicting Edge Case
 
 ![Conflicting Edge Case terminal output](image4.png)
-
-## Project Summary
-
-
 
 ---
 
