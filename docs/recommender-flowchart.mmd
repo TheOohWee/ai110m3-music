@@ -1,0 +1,13 @@
+flowchart LR
+    A[Input: User Preferences] --> B[Load songs from CSV]
+    B --> C[Pick next song row]
+    C --> D[Genre match? Add +2.0 if yes]
+    D --> E[Mood match? Add +1.0 if yes]
+    E --> F[Compute energy similarity points 0.0 to 1.0]
+    F --> G[Total score for this song]
+    G --> H[Store song and score]
+    H --> I{More songs left?}
+    I -->|Yes| C
+    I -->|No| J[Sort all songs by score descending]
+    J --> K[Select Top K]
+    K --> L[Output: Ranked recommendations]

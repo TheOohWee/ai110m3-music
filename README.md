@@ -1,33 +1,77 @@
 # 🎵 Music Recommender Simulation
 
+## Evaluation Screenshots
+
+These screenshots show the terminal output from the profile stress test. They reflect the temporary experiment where energy was weighted more strongly than genre.
+
+### High-Energy Pop
+
+![High-Energy Pop terminal output](image1.png)
+
+### Chill Lofi
+
+![Chill Lofi terminal output](image2.png)
+
+### Deep Intense Rock
+
+![Deep Intense Rock terminal output](image3.png)
+
+### Conflicting Edge Case
+
+![Conflicting Edge Case terminal output](image4.png)
+
 ## Project Summary
 
-In this project you will build and explain a small music recommender system.
 
-Your goal is to:
-
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
-Replace this paragraph with your own summary of what your version does.
 
 ---
 
 ## How The System Works
 
-Explain your design in plain language.
+This recommender follows a simple input -> score -> rank pipeline.
 
-Some prompts to answer:
+### Features Used
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+Each song includes metadata (`title`, `artist`, `genre`, `mood`) and numeric audio features (`energy`, `tempo_bpm`, `valence`, `danceability`, `acousticness`).
 
-You can include a simple diagram or bullet list if helpful.
+The active scoring recipe uses:
+
+1. `genre` (categorical match)
+2. `mood` (categorical match)
+3. `energy` (numeric closeness to user target)
+
+### User Profile
+
+The user profile dictionary stores target preferences, for example:
+
+1. `favorite_genre`
+2. `favorite_mood`
+3. `target_energy`
+
+These are mapped into the scoring inputs (`genre`, `mood`, `energy`) when recommendations are generated.
+
+### Finalized Algorithm Recipe
+
+1. Load songs from `data/songs.csv`.
+2. For each song, initialize score to 0.
+3. Add `+2.0` if song genre matches user favorite genre.
+4. Add `+1.0` if song mood matches user favorite mood.
+5. Add energy similarity points in `[0, 1]` based on closeness to user target energy.
+6. Store `(song, score, explanation)`.
+7. After all songs are scored, sort by score descending.
+8. Return top `k` songs.
+
+Scoring equation:
+
+Final Score = Genre Match Points + Mood Match Points + Energy Similarity Points
+
+Energy similarity is computed with normalized distance:
+
+Energy Similarity Points = 1 - |e_song - e_target| / energy range in dataset
+
+### Potential Bias Note
+
+This system can over-prioritize whichever feature has the biggest weight. In the baseline recipe, genre can dominate the score, which may hide songs that match the user's mood and energy but not the genre. In the temporary experiment run, energy became stronger, so intense songs could rise even when the genre or mood was only a partial match. In both cases, the model still ignores other useful signals like tempo, danceability, and artist diversity.
 
 ---
 
@@ -68,25 +112,17 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+I ran a sensitivity experiment where energy mattered more than genre. That changed the ranking order for mixed profiles and made high-energy songs rise faster even when the genre did not match perfectly.
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+The biggest difference showed up for the conflicting profile: even though the genre and mood were unusual, the recommender still pushed energetic songs near the top. That told me the score is reacting strongly to energy and can be steered by one feature when the weights are changed.
 
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
+The recommender only sees a tiny catalog, so it can repeat the same songs for different users. It does not understand lyrics, artist relationships, or whether two moods are related in a subtle way. Because the experiment gave energy extra weight, it can also over-favor songs that feel intense even when the user's genre or mood is a better clue.
 
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+You will go deeper on this in the model card.
 
 ---
 
@@ -100,6 +136,10 @@ Write 1 to 2 paragraphs here about what you learned:
 
 - about how recommenders turn data into predictions
 - about where bias or unfairness could show up in systems like this
+
+See [reflection.md](reflection.md) for the pair-by-pair comparison notes.
+
+See [reflection.md](reflection.md) for the profile-by-profile comparison notes.
 
 
 ---
